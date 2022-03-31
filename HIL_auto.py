@@ -177,9 +177,9 @@ def create_docx(df, out_png, docx_fp):
 #%%
 if __name__ == '__main__':
     in_fp = './HIL_in.csv'
-    out_fp = 'C:/Users/jiahui/Desktop/HIL NI/' + time_now + '.tdms'
-    out_png = 'C:/Users/jiahui/Desktop/HIL NI/HIL试验结果示例' + time_now + '.png'
-    docx_fp = 'C:/Users/jiahui/Desktop/HIL NI/' + time_now + 'HIL试验报告示例.docx'
+    out_fp = 'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/' + time_now + '.tdms'
+    out_png = 'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/HIL试验结果示例' + time_now + '.png'
+    docx_fp = 'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/' + time_now + 'HIL试验报告示例.docx'
     
     
     df = pd.read_csv(in_fp, encoding = 'utf-8', header = [0], skiprows = [1, 2])
