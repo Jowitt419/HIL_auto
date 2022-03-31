@@ -1,0 +1,4 @@
+ni-veristand-steps-configuration.conf
+放到
+C:\Users\Public\Documents\National Instruments\TestStand 2020 (64-bit)\Components\TypePalettes这里
+还有32bit那里

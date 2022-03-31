@@ -1,0 +1,10 @@
+[1]
+built\documents\National Instruments\TestStand 2020 (32-bit)\Components\TypePalettes\ni-veristand-steps-runtime-lib.lvlibp
+->
+C:\Users\Public\Documents\National Instruments\TestStand 2020 (32-bit)\Components\TypePalettes\ni-veristand-steps-runtime-lib.lvlibp
+
+
+[2]
+built\documents\National Instruments\TestStand 2020 (64-bit)\Components\TypePalettes\ni-veristand-steps-runtime-lib.lvlibp
+->
+C:\Users\Public\Documents\National Instruments\TestStand 2020 (64-bit)\Components\TypePalettes\ni-veristand-steps-runtime-lib.lvlibp

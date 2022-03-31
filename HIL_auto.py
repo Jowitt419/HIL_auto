@@ -3,7 +3,7 @@
 # from niveristand import run_py_as_rtseq
 from niveristand.errors import RunError
 from niveristand.legacy import NIVeriStand
-from NationalInstruments.VeriStand.Data import DoubleValue
+# from NationalInstruments.VeriStand.Data import DoubleValue
 from niveristand.library import wait
 # import numpy as np
 import pandas as pd
@@ -66,23 +66,19 @@ def HIL_test(df, in_fp, out_fp):
             workspace.SetMultipleChannelValues(['Aliases/DesiredRPM', 'Aliases/EnginePower'], # Aliases/EnvTemp
                                                [df['N1(rpm)'][i], True])
                                                # [df['N1(rpm)'][i], df['EnvTemp'][i]])
-            wait(DoubleValue(df['period'][i]))
+            wait(df['period'][i])
         workspace.StopDataLogging(configuration_name = 'Logging')
-        
-        
-        
-        pt_ActualRPM = workspace.GetSingleChannelValue('Aliases/ActualRPM')
-        pt_array = workspace.GetMultipleChannelValues(['Aliases/ActualRPM', 'Aliases/EngineTemp'])
-        pt_what = workspace.GetChannelVectorValues('Aliases/ActualRPM')
-        out_list = [Alias_dict, pt_ActualRPM, pt_array, pt_what]
-        
         
         
         workspace.SetSingleChannelValue('Aliases/EnginePower', False)
         workspace.SetSingleChannelValue('Aliases/DesiredRPM', 0)
-        
-        
-        
+        wait(5)
+        print('wait for 5 sec then shut down')
+        pt_ActualRPM = workspace.GetSingleChannelValue('Aliases/ActualRPM')
+        pt_array = workspace.GetMultipleChannelValues(['Aliases/ActualRPM', 'Aliases/EngineTemp'])
+        pt_what = workspace.GetChannelVectorValues('Aliases/ActualRPM')
+        out_list = [Alias_dict, pt_ActualRPM, pt_array, pt_what]
+
         print("Test Success")
     except RunError as e:
         print("Test Failed: %d -  %s" % (int(e.error.error_code), e.error.message))
