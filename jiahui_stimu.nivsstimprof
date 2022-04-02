@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StimulusProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<FileFormatVersion Major="2012" Minor="0" Fix="0" Build="0" />
+	<Version Major="1" Minor="0" Fix="0" Build="0" />
+	<Setup Name="Setup">
+		<Step xsi:type="OpenWorkspaceStep" />
+	</Setup>
+	<Main Name="Main">
+		<Step xsi:type="RealTimeSequenceCallStep">
+			<ParameterAssignments>
+				<ParameterAssignment Name="EnginePower">
+					<Value xsi:type="SystemDefinitionChannelResource" Path="Aliases/EnginePower" />
+				</ParameterAssignment>
+				<ParameterAssignment Name="DesiredRPM">
+					<Value xsi:type="SystemDefinitionChannelResource" Path="Aliases/DesiredRPM" />
+				</ParameterAssignment>
+				<ParameterAssignment Name="EngineTemp">
+					<Value xsi:type="SystemDefinitionChannelResource" Path="Aliases/EngineTemp" />
+				</ParameterAssignment>
+			</ParameterAssignments>
+			<SequencePath>jiahui_stimu.nivsseq</SequencePath>
+			<OutputEvaluation xsi:type="BooleanEvaluation">
+				<Invert>false</Invert>
+			</OutputEvaluation>
+		</Step>
+	</Main>
+	<CleanUp Name="Clean Up" />
+	<ResultsDirectory>Test Results</ResultsDirectory>
+</StimulusProfile>
