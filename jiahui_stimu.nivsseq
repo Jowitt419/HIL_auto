@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RealTimeSequence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<FileFormatVersion Major="2012" Minor="0" Fix="0" Build="0" />
-	<Version Major="1" Minor="0" Fix="0" Build="11" />
+	<Version Major="1" Minor="0" Fix="0" Build="20" />
 	<References>
 		<Reference>
 			<Path>&lt;VeriStand&gt;:\nivs.lib\Sequence Library\Standard\Timing\Wait.nivsseq</Path>
@@ -49,8 +49,8 @@
 				</DefaultValue>
 			</LocalDeclaration>
 			<LocalDeclaration>
-				<Identifier>DesiredRPM_csv</Identifier>
-				<DefaultValue xsi:type="ImportedDoubleValueArray" FilePath="HIL_in_stimulus.csv" ChannelGroup="HIL_in_stimulus" Channel="DesiredRPM" ImportSubsetStartValue="0" ImportSubsetLength="4" Offset="0" Scale="1" />
+				<Identifier>N1_rpm_</Identifier>
+				<DefaultValue xsi:type="ImportedDoubleValueArray" FilePath="HIL_in.csv" ChannelGroup="HIL_in" Channel="N1(rpm)" ImportSubsetStartValue="0" ImportSubsetLength="6" Offset="0" Scale="1" />
 			</LocalDeclaration>
 		</LocalVariables>
 		<ChannelReferences />
@@ -85,23 +85,43 @@
 							</Statement>
 						</Body>
 						<LoopTest>
-							<ExpressionString>EngineTemp&lt;100</ExpressionString>
+							<ExpressionString>EngineTemp&lt;85</ExpressionString>
 						</LoopTest>
 					</Statement>
+				</Statement>
+				<Statement xsi:type="Expression">
+					<ExpressionString>incre=1</ExpressionString>
+				</Statement>
+				<Statement xsi:type="Expression">
+					<ExpressionString>DesiredRPM=0</ExpressionString>
+				</Statement>
+				<Statement xsi:type="Expression">
+					<ExpressionString>Wait(1)</ExpressionString>
 				</Statement>
 				<Statement xsi:type="ForEachLoop">
 					<AutoYield>true</AutoYield>
 					<Body>
-						<Statement xsi:type="Expression">
-							<ExpressionString>DesiredRPM=i</ExpressionString>
+						<Statement xsi:type="IfElse">
+							<TestExpression>
+								<ExpressionString>incre &gt;= 3</ExpressionString>
+							</TestExpression>
+							<IfTrue>
+								<Statement xsi:type="Expression">
+									<ExpressionString>DesiredRPM=i</ExpressionString>
+								</Statement>
+								<Statement xsi:type="Expression">
+									<ExpressionString>Wait(5)</ExpressionString>
+								</Statement>
+							</IfTrue>
+							<IfFalse />
 						</Statement>
 						<Statement xsi:type="Expression">
-							<ExpressionString>Wait(3)</ExpressionString>
+							<ExpressionString>incre=incre+1</ExpressionString>
 						</Statement>
 					</Body>
 					<LoopVariable>i</LoopVariable>
 					<ArrayExpression>
-						<ExpressionString>DesiredRPM_csv</ExpressionString>
+						<ExpressionString>N1_rpm_</ExpressionString>
 					</ArrayExpression>
 				</Statement>
 			</Body>

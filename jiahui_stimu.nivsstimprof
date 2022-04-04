@@ -19,9 +19,8 @@
 				</ParameterAssignment>
 			</ParameterAssignments>
 			<SequencePath>jiahui_stimu.nivsseq</SequencePath>
-			<OutputEvaluation xsi:type="BooleanEvaluation">
-				<Invert>false</Invert>
-			</OutputEvaluation>
+			<Target />
+			<OutputEvaluation xsi:type="AlwaysPassEvaluation" />
 		</Step>
 	</Main>
 	<CleanUp Name="Clean Up" />
