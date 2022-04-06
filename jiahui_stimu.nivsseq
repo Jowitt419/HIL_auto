@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RealTimeSequence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<FileFormatVersion Major="2012" Minor="0" Fix="0" Build="0" />
-	<Version Major="1" Minor="0" Fix="0" Build="20" />
+	<Version Major="1" Minor="0" Fix="0" Build="22" />
 	<References>
 		<Reference>
 			<Path>&lt;VeriStand&gt;:\nivs.lib\Sequence Library\Standard\Timing\Wait.nivsseq</Path>
