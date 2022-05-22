@@ -6,6 +6,6 @@ def convert_hex_2_dec(string):
     a = int(string, 16) - 16 ** 8
     print(a)
     return a
-a = convert_hex_2_dec(string = '0xfffb4e2f')
+a = convert_hex_2_dec(string = '0x6')
 #%%
 
