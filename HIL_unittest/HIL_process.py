@@ -4,18 +4,25 @@ from niveristand.legacy import NIVeriStand
 from niveristand.errors import RunError
 from niveristand.library import wait
 import time
-import pandas as pd    
+import pandas as pd
+import os
+
 #%%
 class HILTestFunc(unittest.TestCase):
     # TestCase基类方法,所有case执行之前自动执行
     @classmethod
-    def setUpClass(cls):
-        cls.in_fp = './HIL_in.csv'
-        time_now = time.strftime("%m%d_%H%M%S", time.localtime())
-        cls.log_fp = 'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/HIL_unittest/' + 'data_' + time_now + '.tdms'
-        df = pd.read_csv(cls.in_fp, encoding = 'utf-8', header = [0], skiprows = [1, 2])
-        df['period'] = df['timestamp'].diff().shift(periods = -1).fillna(4)
-        cls.df = df
+    def setUpClass(cls):#, in_fp
+        # cls.in_fp = './HIL_in.csv'#in_fp#
+        # time_now = time.strftime("%m%d_%H%M%S", time.localtime())
+        # cls.log_fp = 'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/HIL_unittest/' + time_now + '.tdms'
+        # df = pd.read_csv(cls.in_fp, encoding = 'utf-8', header = [0], skiprows = [1, 2])
+        # df['period'] = df['timestamp'].diff().shift(periods = -1).fillna(4)
+        # cls.df = df
+        df_config = pd.read_csv('./config.csv')
+        print(df_config)
+        cls.df_config = df_config
+        
+        
         
         print("Start HIL test preparation~")
         GATEWAY = "localhost"
@@ -33,29 +40,16 @@ class HILTestFunc(unittest.TestCase):
         cls.Alias_dict = Alias_dict
         print("Getting AliasList")
         
-        print("Start to create log")
-        log_info = NIVeriStand.CreateLogInfo()
-        log_info.file_path = cls.log_fp#'VeriStand.tdms'#
-        log_info.description = "Engine demo logging"
-        log_info.rate = 10
-        channels_paths_to_log = [
-            "Aliases/EnginePower",
-            "Aliases/DesiredRPM",
-            "Aliases/ActualRPM",
-            "Aliases/EngineTemp"]
-        channels_to_log = [NIVeriStand.CreateLogChannel(path) for path in channels_paths_to_log]
-        NIVeriStand.SetLogInfoChannels(log_info, channels_to_log)
-        cls.log_info = log_info
     # TestCase基类方法,所有case执行之后自动执行
     @classmethod
     def tearDownClass(cls):
         workspace = cls.workspace
-        workspace.DisconnectFromSystem('', True)
+        # workspace.DisconnectFromSystem('', True)
         print('Disconnect from target~')
         print("Clean up completed")
         
     # TestCase基类方法,每次执行case前自动执行
-    def setUp(cls):   
+    def setUp(cls):  
         print("Unit test setup")
         print("Engine power up")
         workspace = cls.workspace
@@ -75,47 +69,102 @@ class HILTestFunc(unittest.TestCase):
         
         
     def test_vib(cls):
-        print("Unit test start")
+        print("==============")
+        print("VIB TEST START")
+        print("==============")
+        time_now = time.strftime("%m%d_%H%M%S", time.localtime())
+        df_tmp = cls.df_config
+        cls.log_fp = os.getcwd() + '\\' + df_tmp.loc[df_tmp['test_name'] == 'vib', 'log_fp'].values[0]
+        cls.log_fp = cls.log_fp.replace('.tdms', '-'+time_now+'.tdms')
+        print(cls.log_fp)
+        cls.in_fp = df_tmp.loc[df_tmp['test_name'] == 'vib', 'in_fp'].values[0]
+        print(cls.in_fp)
+        
+        # cls.in_fp = './HIL_in.csv'#in_fp#
+        # cls.log_fp = 'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/HIL_unittest/' + time_now + '.tdms'
+        df = pd.read_csv(cls.in_fp, encoding = 'utf-8', header = [0], skiprows = [1, 2])
+        df['period'] = df['timestamp'].diff().shift(periods = -1).fillna(4)
+        cls.df = df
+        
+        
+        print("start to create log")
+        log_info = NIVeriStand.CreateLogInfo()
+        log_info.file_path = cls.log_fp#'VeriStand.tdms'#
+        log_info.description = "Engine demo logging"
+        log_info.rate = 1000/5
+        channels_paths_to_log = [
+            "Aliases/EnginePower",
+            "Aliases/DesiredRPM",
+            "Aliases/ActualRPM",
+            "Aliases/EngineTemp"]
+        channels_to_log = [NIVeriStand.CreateLogChannel(path) for path in channels_paths_to_log]
+        NIVeriStand.SetLogInfoChannels(log_info, channels_to_log)
+        cls.log_info = log_info
+        
+        workspace = cls.workspace
+        log_info = cls.log_info
+        df = cls.df
+        workspace.StartDataLogging(configuration_name = 'Logging', logInfo = log_info)
+        for i in range(len(df)):
+            workspace.SetMultipleChannelValues(['Aliases/DesiredRPM', 'Aliases/EnginePower'],
+                                               [df['N1(rpm)'][i], True])
+            wait(df['period'][i])
+        workspace.StopDataLogging(configuration_name = 'Logging')
+        print("stop log")
+        
+        # pt_ActualRPM = workspace.GetSingleChannelValue('Aliases/ActualRPM')
+        # pt_array = workspace.GetMultipleChannelValues(['Aliases/ActualRPM', 'Aliases/EngineTemp'])
+        # pt_what = workspace.GetChannelVectorValues('Aliases/ActualRPM')
+        # Alias_dict = cls.Alias_dict
+        # out_list = [Alias_dict, pt_ActualRPM, pt_array, pt_what]
+        print("==============")
+        print("VIB TEST SUCCESS")
+        print("==============")
+    def test_start(cls):
+        print("==============")
+        print("START TEST START")
+        print("==============")
+        time_now = time.strftime("%m%d_%H%M%S", time.localtime())
+        df_tmp = cls.df_config
+        cls.log_fp = os.getcwd() + '\\' + df_tmp.loc[df_tmp['test_name'] == 'start', 'log_fp'].values[0]
+        cls.log_fp = cls.log_fp.replace('.tdms', '-'+time_now+'.tdms')
+        print(cls.log_fp)
+        cls.in_fp = df_tmp.loc[df_tmp['test_name'] == 'start', 'in_fp'].values[0]
+        print(cls.in_fp)
+        
+        df = pd.read_csv(cls.in_fp, encoding = 'utf-8', header = [0], skiprows = [1, 2])
+        df['period'] = df['timestamp'].diff().shift(periods = -1).fillna(4)
+        cls.df = df
+        
+        
+        print("start to create log")
+        log_info = NIVeriStand.CreateLogInfo()
+        log_info.file_path = cls.log_fp#'VeriStand.tdms'#
+        log_info.description = "Engine demo logging"
+        log_info.rate = 1000/5
+        channels_paths_to_log = [
+            "Aliases/EnginePower",
+            "Aliases/DesiredRPM",
+            "Aliases/ActualRPM",
+            "Aliases/EngineTemp"]
+        channels_to_log = [NIVeriStand.CreateLogChannel(path) for path in channels_paths_to_log]
+        NIVeriStand.SetLogInfoChannels(log_info, channels_to_log)
+        cls.log_info = log_info
+        
         workspace = cls.workspace
         log_info = cls.log_info
         df = cls.df
         workspace.StartDataLogging(configuration_name = 'Logging', logInfo = log_info)
         for i in range(len(df)):
             # workspace.SetSingleChannelValue('Aliases/DesiredRPM', df['N1(rpm)'][i])
-            workspace.SetMultipleChannelValues(['Aliases/DesiredRPM', 'Aliases/EnginePower'], # Aliases/EnvTemp
+            workspace.SetMultipleChannelValues(['Aliases/DesiredRPM', 'Aliases/EnginePower'],
                                                [df['N1(rpm)'][i], True])
-                                               # [df['N1(rpm)'][i], df['EnvTemp'][i]])
             wait(df['period'][i])
         workspace.StopDataLogging(configuration_name = 'Logging')
-        
-        
-        pt_ActualRPM = workspace.GetSingleChannelValue('Aliases/ActualRPM')
-        pt_array = workspace.GetMultipleChannelValues(['Aliases/ActualRPM', 'Aliases/EngineTemp'])
-        pt_what = workspace.GetChannelVectorValues('Aliases/ActualRPM')
-        Alias_dict = cls.Alias_dict
-        out_list = [Alias_dict, pt_ActualRPM, pt_array, pt_what]
-        print("Unit test success")
-        
-    # @unittest.skip("skip for now")
-    # def test_add(self):
-    #     self.assertEqual(3, add(1, 2))
-    #     print("看到这里，说明test_add没有跳过！")
-    #     self.assertNotEqual(3, add(2, 2))  # 测试业务方法add
-
-    # def test_minus(self):
-    #     print("看到这里，说明test_minus进来了一下")
-    #     self.skipTest('跳过这个测试用例')
-    #     print("看到这里，说明test_minus没有跳过！")
-    #     self.assertEqual(1, minus(3, 2))  # 测试业务方法minus
-
-    # def test_multi(self):
-    #     print("看到这里，说明test_multi没有跳过！")
-    #     self.assertEqual(6, multi(2, 3))  # 测试业务方法multi
-
-    # def test_divide(self):
-    #     print("看到这里，说明test_divide没有跳过！")
-    #     self.assertEqual(2, divide(6, 3))  # 测试业务方法divide
-    #     self.assertEqual(2.5, divide(5, 2))
+        print("stop log")
+        print("==============")
+        print("START TEST SUCCESS")
+        print("==============")
 #%%
 if __name__ == '__main__':
     unittest.main(verbosity=2)

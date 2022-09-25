@@ -10,24 +10,27 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 
 #%%
 class Data_2_Report(object):
-    def __init__(self, df_raw, rate, out_png, docx_fp):
+    def __init__(self, df_raw):
         # self.out_fp = r'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/TestStand_log/ts_log.tdms'
         self.df_raw = df_raw
-        self.rate = rate
-        self.out_png = out_png#r
-        self.docx_fp = docx_fp#r'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/HIL试验报告示例.docx'
+        # self.rate = rate
+        # self.out_png = out_png#r
+        # self.docx_fp = docx_fp#r'C:/Users/jiahui/Desktop/HIL NI/HIL_auto/HIL试验报告示例.docx'
         
-    def postprocessing(self):
+    def postprocessing(self, rate):
+        print('Start to postprocess tdms~')
         df_raw = self.df_raw
         col1 = df_raw.columns.to_list()
         col2 = [n.replace('/\'Aliases\'/\'', '').replace('\'', '') for n in col1]
         df = df_raw.rename(columns = dict(zip(col1, col2)))
-        df['time'] = df.index*1/self.rate
+        df['time'] = df.index*1/rate
+        print('End of postprocessing tdms~')
         self.df = df
     
-    def plot_HIL(self):
+    def plot_HIL(self, out_png):
+        print('Start to plot!')
         df = self.df
-        out_png = self.out_png
+        # self.out_png = out_png
         fig = plt.figure(figsize = (6, 5), dpi = 200)
         gs = fig.add_gridspec(2,1, height_ratios=(2,1), hspace=0)
         ax1 = fig.add_subplot(gs[0])
@@ -49,12 +52,13 @@ class Data_2_Report(object):
         plt.grid()
         plt.suptitle('HIL试验结果示例', fontsize = 14)
         plt.savefig(out_png)
+        print('End of plot!')
         
-        
-    def create_docx(self):
+    def create_docx(self, out_png, docx_fp):
+        print('Start to create report!')
         df = self.df
-        out_png = self.out_png
-        docx_fp = self.docx_fp
+        # out_png = self.out_png
+        # docx_fp = self.docx_fp
         document = Document()
         document.add_heading('HIL试验报告示例', level = 1)
         
@@ -103,3 +107,4 @@ class Data_2_Report(object):
         table.style = 'Table Grid'
         # document.add_page_break()
         document.save(docx_fp)
+        print('Report Generated!')
